@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐾 Cat Claws 貓咪食堂</title>
+  <?!= include('css'); ?>
+</head>
+<body>
+  <!-- 載入中動畫 -->
+  <div id="loading" class="loading-overlay">
+    <div class="cat-loading">
+      <div class="cat-face">
+        <div class="cat-ear cat-ear-left"></div>
+        <div class="cat-ear cat-ear-right"></div>
+        <div class="cat-head">
+          <div class="cat-eyes">
+            <div class="cat-eye"></div>
+            <div class="cat-eye"></div>
+          </div>
+          <div class="cat-nose"></div>
+          <div class="cat-mouth"></div>
+        </div>
+      </div>
+      <p class="loading-text">喵～載入中...</p>
+    </div>
+  </div>
+
+  <!-- 主容器 -->
+  <div class="container">
+    <!-- 頁面頂部 - 可愛貓咪 -->
+    <header class="header">
+      <div class="header-cat">
+        <div class="cat-avatar">
+          <div class="cat-ear left"></div>
+          <div class="cat-ear right"></div>
+          <div class="cat-face-main">
+            <div class="cat-eye left-eye">
+              <div class="pupil"></div>
+            </div>
+            <div class="cat-eye right-eye">
+              <div class="pupil"></div>
+            </div>
+            <div class="cat-nose-main"></div>
+            <div class="cat-whisker left-whisker"></div>
+            <div class="cat-whisker right-whisker"></div>
+          </div>
+        </div>
+      </div>
+      <h1 class="title">🐾 Cat Claws 貓咪食堂</h1>
+      <p class="subtitle">歡迎光臨，讓我們為您送上美味的餐點～</p>
+    </header>
+
+    <!-- 選單區域 -->
+    <section class="menu-section">
+      <!-- 主食 -->
+      <div class="category">
+        <h2 class="category-title">🍛 主食</h2>
+        <div class="menu-grid" id="mains-menu"></div>
+      </div>
+
+      <!-- 湯品 -->
+      <div class="category">
+        <h2 class="category-title">🍲 湯品</h2>
+        <div class="menu-grid" id="soups-menu"></div>
+      </div>
+
+      <!-- 點心 -->
+      <div class="category">
+        <h2 class="category-title">🍰 點心</h2>
+        <div class="menu-grid" id="desserts-menu"></div>
+      </div>
+
+      <!-- 飲料 -->
+      <div class="category">
+        <h2 class="category-title">🥤 飲料</h2>
+        <div class="menu-grid" id="drinks-menu"></div>
+      </div>
+    </section>
+
+    <!-- 訂單摘要與表單 -->
+    <section class="order-section">
+      <div class="order-card">
+        <h2 class="order-title">📝 您的訂單</h2>
+
+        <!-- 訂單明細 -->
+        <div class="order-summary" id="order-summary">
+          <p class="empty-order">還沒有選擇任何餐點喔～</p>
+        </div>
+
+        <!-- 總金額 -->
+        <div class="total-amount">
+          <span>總金額：</span>
+          <span class="amount" id="total-amount">NT$ 0</span>
+        </div>
+
+        <!-- 顧客資訊表單 -->
+        <div class="customer-form">
+          <div class="form-group">
+            <label for="customerName">姓名 <span class="required">*</span></label>
+            <input type="text" id="customerName" placeholder="請輸入您的姓名" required>
+          </div>
+
+          <div class="form-group">
+            <label>取餐方式 <span class="required">*</span></label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="diningOption" value="內用" checked>
+                <span class="radio-custom"></span>
+                內用
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="diningOption" value="外帶">
+                <span class="radio-custom"></span>
+                外帶
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="note">備註</label>
+            <textarea id="note" rows="3" placeholder="有什麼特殊需求嗎？"></textarea>
+          </div>
+
+          <!-- 送出按鈕 -->
+          <button class="submit-btn" id="submit-btn" onclick="submitOrder()">
+            <span class="btn-icon">🐾</span>
+            送出訂單
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 成功提示 Modal -->
+  <div class="modal" id="success-modal">
+    <div class="modal-content">
+      <div class="success-cat">
+        <div class="success-face">😺</div>
+        <div class="paw">🐾</div>
+      </div>
+      <h2 class="success-title">喵～訂單已送出！</h2>
+      <p class="success-message" id="success-message">您的訂單編號：<span id="order-number"></span></p>
+      <button class="modal-btn" onclick="closeModal()">好的</button>
+    </div>
+  </div>
+
+  <?!= include('js'); ?>
+</body>
+</html>
