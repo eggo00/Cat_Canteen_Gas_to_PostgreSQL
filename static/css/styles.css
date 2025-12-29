@@ -1,4 +1,3 @@
-<style>
 /* ===== 全域樣式 ===== */
 * {
   margin: 0;
@@ -751,6 +750,29 @@ body {
   box-shadow: 0 6px 15px rgba(244, 164, 96, 0.4);
 }
 
+/* Toast 動畫 */
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
 /* ===== 響應式設計 ===== */
 @media (max-width: 768px) {
   .title {
@@ -765,4 +787,3 @@ body {
     position: static;
   }
 }
-</style>

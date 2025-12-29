@@ -1,4 +1,3 @@
-<script>
 // ===== 全域變數 =====
 let cart = []; // 購物車
 let menuData = {}; // 選單資料
@@ -15,18 +14,20 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 // ===== 載入選單 =====
-function loadMenu() {
-  // 從後端取得選單資料
-  google.script.run
-    .withSuccessHandler(function(data) {
-      menuData = data;
-      renderMenu(data);
-    })
-    .withFailureHandler(function(error) {
-      console.error('載入選單失敗:', error);
-      alert('載入選單時發生錯誤，請重新整理頁面');
-    })
-    .getMenuData();
+async function loadMenu() {
+  try {
+    // 從後端 API 取得選單資料（改為 fetch，不再使用 google.script.run）
+    const response = await fetch('/api/menu/');
+    if (!response.ok) {
+      throw new Error('載入選單失敗');
+    }
+    const data = await response.json();
+    menuData = data;
+    renderMenu(data);
+  } catch (error) {
+    console.error('載入選單失敗:', error);
+    alert('載入選單時發生錯誤，請重新整理頁面');
+  }
 }
 
 // ===== 渲染選單 =====
@@ -217,7 +218,7 @@ function removeFromCart(index) {
 }
 
 // ===== 送出訂單 =====
-function submitOrder() {
+async function submitOrder() {
   // 驗證
   const customerName = document.getElementById('customerName').value.trim();
 
@@ -262,30 +263,36 @@ function submitOrder() {
   submitBtn.disabled = true;
   submitBtn.textContent = '送出中...';
 
-  // 送出到後端
-  console.log('呼叫 google.script.run.submitOrder...');
-  google.script.run
-    .withSuccessHandler(function(result) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<span class="btn-icon">🐾</span> 送出訂單';
+  try {
+    // 送出到後端 API（改為 fetch，不再使用 google.script.run）
+    const response = await fetch('/api/orders/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData)
+    });
 
-      if (result.success) {
-        // 顯示成功訊息
-        showSuccessModal(result.orderNumber);
+    const result = await response.json();
 
-        // 清空購物車和表單
-        clearOrder();
-      } else {
-        alert(result.message || '送出失敗，請再試一次');
-      }
-    })
-    .withFailureHandler(function(error) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<span class="btn-icon">🐾</span> 送出訂單';
-      console.error('送出訂單失敗:', error);
-      alert('送出訂單時發生錯誤，請再試一次');
-    })
-    .submitOrder(orderData);
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<span class="btn-icon">🐾</span> 送出訂單';
+
+    if (response.ok && result.success) {
+      // 顯示成功訊息
+      showSuccessModal(result.orderNumber);
+
+      // 清空購物車和表單
+      clearOrder();
+    } else {
+      alert(result.detail || result.message || '送出失敗，請再試一次');
+    }
+  } catch (error) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<span class="btn-icon">🐾</span> 送出訂單';
+    console.error('送出訂單失敗:', error);
+    alert('送出訂單時發生錯誤，請再試一次');
+  }
 }
 
 // ===== 顯示成功 Modal =====
@@ -343,30 +350,3 @@ function showToast(message) {
     }, 300);
   }, 2000);
 }
-
-// ===== Toast 動畫 =====
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideInRight {
-    from {
-      transform: translateX(400px);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-  @keyframes slideOutRight {
-    from {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(400px);
-      opacity: 0;
-    }
-  }
-`;
-document.head.appendChild(style);
-</script>

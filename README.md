@@ -1,188 +1,365 @@
-# 🐾 Cat Claws 貓咪食堂
+# 🐾 Cat Claws 貓咪食堂 v2.0
 
-一個可愛的貓咪主題網頁訂餐系統，使用 Google Apps Script 建立。
+一個可愛的貓咪主題訂餐系統，使用 Python + FastAPI + PostgreSQL 開發，可部署到 Zeabur 雲端平台。
 
-## ✨ 功能特色
+![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)
 
-### 🎨 視覺設計
-- 溫暖可愛的貓咪卡通風格
-- 奶茶色/淺咖啡/米白/淡橘色系
-- 貓爪按鈕與圓角卡片設計
-- 可愛的 CSS 貓咪動畫
+## ✨ 特色功能
 
-### 🍽 訂餐功能
-- **主食**：貓爪咖哩飯、鮭魚親子丼、喵喵義大利麵、貓掌漢堡排
-- **湯品**：貓咪味噌湯、奶油南瓜濃湯、海鮮巧達湯
-- **點心**：貓掌布丁、鮮奶雪花冰、焦糖烤布蕾、貓咪銅鑼燒
-- **飲料**：可選擇冰熱、甜度
+- 🎨 **可愛貓咪主題** - 純 CSS 繪製的貓咪動畫
+- 📱 **響應式設計** - 完美支援手機和桌面裝置
+- 🛡️ **安全防護** - XSS 防護、輸入驗證、價格驗證
+- 🚀 **高性能** - FastAPI 異步架構
+- 📊 **資料分析** - 內建 pandas/numpy，可擴充分析功能
+- 🔄 **自動 API 文檔** - Swagger UI 和 ReDoc
+- ☁️ **雲端部署** - 支援 Zeabur 一鍵部署
 
-### 📝 訂單管理
-- 即時購物車功能
-- 自動計算總金額
-- 訂單資料自動儲存到 Google Sheets
-- 成功提示動畫
+## 📋 功能列表
 
-## 📁 專案結構
+### 前端功能
+- ✅ 選單瀏覽（主食、湯品、點心、飲料）
+- ✅ 購物車管理
+- ✅ 飲料客製化（溫度、甜度）
+- ✅ 訂單送出
+- ✅ 訂單編號顯示
 
-```
-Gas_Cat_Canteen/
-├── appsscript.json      # GAS 專案配置
-├── Code.gs              # 主要後端邏輯
-├── OrderService.gs      # 訂單處理服務
-├── index.html           # 主頁面 HTML
-├── css.html             # 樣式表
-├── js.html              # JavaScript 邏輯
-├── DEPLOYMENT.md        # 部署指南
-├── README.md            # 專案說明
-└── .gitignore           # Git 忽略檔案
-```
+### 後端功能
+- ✅ RESTful API
+- ✅ PostgreSQL 資料庫
+- ✅ 訂單驗證（價格、數量、格式）
+- ✅ 安全防護（XSS、SQL Injection）
+- ✅ 錯誤記錄
+- ✅ 健康檢查端點
 
-## 🚀 快速開始
+### 未來擴充（Python 優勢）
+- 📊 資料分析儀表板
+- 🤖 AI 推薦系統
+- 📈 營收統計報表
+- 🔔 LINE Bot 整合
 
-### 1. 安裝 CLASP
+## 🛠️ 技術棧
+
+### 後端
+- **框架**: FastAPI 0.104+
+- **資料庫**: PostgreSQL 15+
+- **ORM**: SQLAlchemy 2.0
+- **驗證**: Pydantic
+- **Web 伺服器**: Uvicorn
+
+### 前端
+- **HTML5** + **CSS3**
+- **Vanilla JavaScript**（無框架）
+- **Jinja2** 模板引擎
+
+### 資料分析（可選）
+- **pandas** - 資料處理
+- **numpy** - 數值計算
+- **matplotlib / plotly** - 資料視覺化
+
+## 📦 快速開始
+
+### 1. 環境需求
+
+- Python 3.11+
+- PostgreSQL 15+
+- pip
+
+### 2. 安裝相依套件
 
 ```bash
-npm install -g @google/clasp
+# 建立虛擬環境
+python -m venv venv
+
+# 啟動虛擬環境
+# macOS/Linux:
+source venv/bin/activate
+# Windows:
+venv\Scripts\activate
+
+# 安裝套件
+pip install -r requirements.txt
 ```
 
-### 2. 登入並啟用 API
+### 3. 設定環境變數
 
 ```bash
-clasp login
+# 複製環境變數範本
+cp .env.example .env
+
+# 編輯 .env 檔案，設定資料庫連線
+nano .env
 ```
 
-前往 https://script.google.com/home/usersettings 啟用 Apps Script API
+```.env
+DATABASE_URL=postgresql://user:password@localhost:5432/cat_canteen
+SECRET_KEY=your-secret-key-here
+DEBUG=True
+```
 
-### 3. 建立專案並部署
+### 4. 初始化資料庫
 
 ```bash
-cd Gas_Cat_Canteen
-clasp create --type webapp --title "貓咪食堂訂餐系統"
-clasp push
-clasp deploy
+# 建立資料表
+python scripts/init_db.py
 ```
 
-詳細部署步驟請參考 [DEPLOYMENT.md](DEPLOYMENT.md)
+### 5. 啟動開發伺服器
 
-## 🎯 使用說明
+```bash
+# 方法 1：直接執行
+python -m uvicorn app.main:app --reload
 
-### 顧客端
-1. 開啟 Web App URL
-2. 瀏覽選單並選擇喜歡的餐點
-3. 調整數量，飲料可選擇冰熱和甜度
-4. 點選「加入訂單」
-5. 填寫姓名、選擇內用/外帶
-6. 送出訂單
-
-### 管理端
-訂單會自動儲存到 Google Sheets，包含：
-- 時間戳記
-- 訂單編號
-- 顧客姓名
-- 取餐方式
-- 餐點明細
-- 飲料明細
-- 總金額
-- 備註
-
-## 🛠 技術棧
-
-- **後端**：Google Apps Script
-- **前端**：HTML5 + CSS3 + Vanilla JavaScript
-- **資料庫**：Google Sheets
-- **開發工具**：CLASP
-
-## 🎨 設計特色
-
-### 貓咪元素
-- 純 CSS 繪製的貓咪頭像
-- 貓爪按鈕設計
-- 載入動畫貓咪
-- 成功提示貓咪表情
-
-### 互動效果
-- 卡片 hover 動畫
-- 按鈕點擊回饋
-- Toast 通知訊息
-- Modal 彈窗
-
-### 響應式設計
-- 支援桌面與行動裝置
-- 自適應網格佈局
-
-## 📊 資料格式
-
-### 訂單資料結構
-
-```javascript
-{
-  customerName: "王小明",
-  diningOption: "內用",
-  note: "不要加蔥",
-  items: [
-    {
-      id: "m1",
-      name: "貓爪咖哩飯",
-      price: 120,
-      quantity: 2
-    },
-    {
-      id: "dr1",
-      name: "貓爪拿鐵",
-      price: 80,
-      quantity: 1,
-      temperature: "熱",
-      sweetness: "半糖"
-    }
-  ],
-  totalAmount: 320
-}
+# 方法 2：使用 main.py
+python app/main.py
 ```
 
-## 🔧 客製化
+訪問：
+- 主頁：http://localhost:8000
+- API 文檔：http://localhost:8000/api/docs
+- 健康檢查：http://localhost:8000/health
 
-### 修改選單
+## 🚀 部署到 Zeabur
 
-編輯 `Code.gs` 中的 `getMenuData()` 函數：
+### 方法一：GitHub 連接（推薦）
 
-```javascript
-function getMenuData() {
-  return {
-    mains: [
-      { id: 'm1', name: '您的餐點名稱', price: 價格 }
-    ],
-    // ...
-  };
-}
+1. **推送程式碼到 GitHub**
+   ```bash
+   git add .
+   git commit -m "Migrate to Python + FastAPI + PostgreSQL"
+   git push origin main
+   ```
+
+2. **在 Zeabur 建立專案**
+   - 訪問 [Zeabur](https://zeabur.com)
+   - 建立新專案
+   - 連接 GitHub Repository
+
+3. **新增 PostgreSQL 服務**
+   - 點擊「Add Service」
+   - 選擇「PostgreSQL」
+   - Zeabur 會自動建立資料庫
+
+4. **設定環境變數**
+   ```env
+   DATABASE_URL=${POSTGRES_URL}  # Zeabur 自動提供
+   DEBUG=False
+   SECRET_KEY=your-production-secret-key
+   ```
+
+5. **部署**
+   - Zeabur 會自動偵測 Python 專案
+   - 自動安裝 requirements.txt
+   - 自動啟動應用
+
+### 方法二：Zeabur CLI
+
+```bash
+# 安裝 Zeabur CLI
+npm install -g @zeabur/cli
+
+# 登入
+zeabur login
+
+# 部署
+zeabur deploy
 ```
 
-### 修改顏色
+## 📂 專案結構
 
-編輯 `css.html` 中的顏色變數：
-
-```css
-/* 主色調 */
-#F4A460  /* 淺咖啡色 */
-#FFE4C4  /* 米白色 */
-#5D4037  /* 深咖啡色 */
+```
+Cat_Canteen_PostgreSQL/
+├── app/                        # 應用程式主目錄
+│   ├── models/                 # 資料模型（SQLAlchemy）
+│   │   └── order.py           # 訂單模型
+│   ├── schemas/                # 資料驗證（Pydantic）
+│   │   └── order.py           # 訂單 schema
+│   ├── routers/                # API 路由
+│   │   ├── orders.py          # 訂單 API
+│   │   └── menu.py            # 選單 API
+│   ├── services/               # 業務邏輯
+│   │   ├── order_service.py   # 訂單服務
+│   │   └── menu_service.py    # 選單服務
+│   ├── utils/                  # 工具函數
+│   │   ├── validation.py      # 輸入驗證
+│   │   └── order_number.py    # 訂單編號生成
+│   ├── config.py              # 配置管理
+│   ├── database.py            # 資料庫連線
+│   └── main.py                # FastAPI 主程式
+│
+├── static/                     # 靜態檔案
+│   ├── css/
+│   │   └── styles.css         # 樣式表
+│   └── js/
+│       └── script.js          # 前端腳本
+│
+├── templates/                  # HTML 模板
+│   └── index.html             # 主頁面
+│
+├── scripts/                    # 工具腳本
+│   ├── init_db.py             # 資料庫初始化
+│   └── migrate_from_sheets.py # Google Sheets 遷移（可選）
+│
+├── requirements.txt            # Python 依賴
+├── .env.example               # 環境變數範本
+├── .gitignore                 # Git 忽略規則
+└── README.md                  # 專案說明
 ```
 
-### 修改試算表名稱
+## 🔌 API 端點
 
-編輯 `OrderService.gs` 中的：
+### 選單 API
+- `GET /api/menu/` - 取得完整選單
+- `GET /api/menu/item/{item_id}` - 取得單一餐點
 
-```javascript
-var SHEET_NAME = '貓咪食堂訂單';
+### 訂單 API
+- `POST /api/orders/` - 建立訂單
+- `GET /api/orders/` - 取得訂單列表
+- `GET /api/orders/{order_number}` - 查詢訂單
+
+### 系統
+- `GET /` - 主頁面
+- `GET /health` - 健康檢查
+- `GET /api` - API 資訊
+- `GET /api/docs` - Swagger API 文檔
+- `GET /api/redoc` - ReDoc API 文檔
+
+## 🎨 選單項目
+
+### 主食 🍛
+- 貓爪咖哩飯 - NT$ 120
+- 鮭魚親子丼 - NT$ 150
+- 喵喵義大利麵 - NT$ 130
+- 貓掌漢堡排 - NT$ 140
+
+### 湯品 🍲
+- 貓咪味噌湯 - NT$ 30
+- 奶油南瓜濃湯 - NT$ 40
+- 海鮮巧達湯 - NT$ 50
+
+### 點心 🍰
+- 貓掌布丁 - NT$ 60
+- 鮮奶雪花冰 - NT$ 70
+- 焦糖烤布蕾 - NT$ 65
+- 貓咪銅鑼燒 - NT$ 55
+
+### 飲料 🥤
+- 貓爪拿鐵 - NT$ 80
+- 焦糖瑪奇朵 - NT$ 90
+- 抹茶拿鐵 - NT$ 85
+- 水果茶 - NT$ 70
+- 檸檬冰茶 - NT$ 60
+
+## 🛡️ 安全機制
+
+1. **輸入驗證** - Pydantic schema 自動驗證
+2. **XSS 防護** - HTML 特殊字元轉義
+3. **價格驗證** - 後端驗證防止前端竄改
+4. **SQL Injection 防護** - SQLAlchemy ORM 參數化查詢
+5. **錯誤處理** - 完整的錯誤記錄，不暴露敏感資訊
+
+## 📊 資料庫結構
+
+### orders 資料表
+
+| 欄位 | 型別 | 說明 |
+|------|------|------|
+| id | Integer | 主鍵 |
+| order_number | String(20) | 訂單編號（CAT + YYMMDDHHmmss）|
+| customer_name | String(100) | 顧客姓名 |
+| pickup_method | String(20) | 取餐方式（內用/外帶）|
+| items | JSON | 餐點明細 |
+| drinks | JSON | 飲料明細 |
+| total_amount | Integer | 總金額 |
+| notes | Text | 備註 |
+| created_at | DateTime | 建立時間 |
+
+## 🔧 開發
+
+### 執行測試
+
+```bash
+# 安裝測試套件
+pip install pytest pytest-asyncio httpx
+
+# 執行測試
+pytest
 ```
 
-## 📝 授權
+### 資料庫遷移（Alembic）
 
-此專案為教學用途，可自由使用與修改。
+```bash
+# 初始化 Alembic
+alembic init alembic
 
-## 🐱 作者
+# 建立遷移
+alembic revision --autogenerate -m "description"
 
-使用 Claude Code 與 Google Apps Script 打造的可愛訂餐系統
+# 執行遷移
+alembic upgrade head
+```
+
+### 程式碼格式化
+
+```bash
+# 安裝工具
+pip install black isort
+
+# 格式化
+black app/
+isort app/
+```
+
+## 🐛 常見問題
+
+### 1. 資料庫連線失敗
+
+檢查 `.env` 的 `DATABASE_URL` 是否正確：
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/cat_canteen
+```
+
+### 2. 靜態檔案無法載入
+
+確認目錄結構正確：
+```
+static/
+├── css/styles.css
+└── js/script.js
+```
+
+### 3. 訂單送出失敗
+
+檢查瀏覽器 Console 錯誤訊息，確認 API 端點正確。
+
+## 📝 版本歷史
+
+### v2.0.0 (2025-01-XX)
+- 🎉 從 Google Apps Script 遷移到 Python + FastAPI
+- 🗄️ 改用 PostgreSQL 資料庫
+- 🚀 支援 Zeabur 雲端部署
+- 📊 加入資料分析能力（pandas/numpy）
+- 📚 自動 API 文檔（Swagger）
+
+### v1.0.0
+- ✅ 基於 Google Apps Script 的訂餐系統
+- ✅ 使用 Google Sheets 儲存訂單
+
+## 📄 授權
+
+MIT License
+
+## 👨‍💻 開發者
+
+由 Claude Code 協助完成從 GAS 到 Python + FastAPI 的遷移。
+
+## 🙏 致謝
+
+- FastAPI - 現代化的 Python Web 框架
+- SQLAlchemy - 強大的 Python ORM
+- Zeabur - 優秀的雲端部署平台
 
 ---
 
-**喵～ 歡迎來到貓咪食堂！🐾**
+🐾 **Cat Claws 貓咪食堂** - 喵～歡迎光臨！

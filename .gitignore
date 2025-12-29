@@ -1,42 +1,95 @@
-# CLASP - 包含 Script ID（敏感！）
-.clasp.json
-.clasprc.json
+# ===== Python =====
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 
-# Node modules
-node_modules/
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# 環境變數和配置文件（如果未來添加）
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# ===== 環境變數和配置文件 =====
 .env
 .env.local
 .env.*.local
 config.json
 secrets.json
 
-# 個人筆記和臨時文件
-NOTES.md
-TODO.md
-PRIVATE_*.md
+# ===== 資料庫 =====
+*.db
+*.sqlite
+*.sqlite3
 
-# 系統文件
+# ===== 日誌 =====
+*.log
+logs/
+
+# ===== 系統文件 =====
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# 編輯器
+# ===== 編輯器 =====
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.vs/
 
-# 日誌
-*.log
-logs/
-
-# 臨時文件
+# ===== 臨時文件 =====
 *.tmp
 *.temp
 .cache/
+*.bak
 
-# Claude 對話記錄（如果有）
+# ===== Claude 對話記錄 =====
 .claude/
+
+# ===== 個人筆記 =====
+NOTES.md
+TODO.md
+PRIVATE_*.md
+
+# ===== Alembic =====
+alembic/versions/*.pyc
+
+# ===== QR Code =====
+cat_canteen_qrcode.png
+*_qrcode.png
