@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import orders, menu
+from app.routers import orders, menu, analytics
 from app.config import get_settings
 from app.database import engine, Base
 import logging
@@ -52,6 +52,7 @@ templates = Jinja2Templates(directory="templates")
 # 註冊路由
 app.include_router(orders.router)
 app.include_router(menu.router)
+app.include_router(analytics.router)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -85,7 +86,8 @@ async def api_info():
         "docs": "/api/docs",
         "endpoints": {
             "menu": "/api/menu",
-            "orders": "/api/orders"
+            "orders": "/api/orders",
+            "analytics": "/api/analytics"
         }
     }
 
