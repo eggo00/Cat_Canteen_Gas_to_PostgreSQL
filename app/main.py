@@ -67,6 +67,15 @@ async def home(request: Request):
     )
 
 
+@app.get("/analytics", response_class=HTMLResponse)
+async def analytics_dashboard(request: Request):
+    """分析報表後台頁面"""
+    return templates.TemplateResponse(
+        "analytics.html",
+        {"request": request}
+    )
+
+
 @app.get("/health")
 async def health_check():
     """健康檢查端點"""
@@ -84,6 +93,7 @@ async def api_info():
         "message": "歡迎使用 Cat Claws 貓咪食堂 API",
         "version": settings.app_version,
         "docs": "/api/docs",
+        "dashboard": "/analytics",
         "endpoints": {
             "menu": "/api/menu",
             "orders": "/api/orders",
