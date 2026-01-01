@@ -79,12 +79,9 @@ desktop.ini
 .cache/
 *.bak
 
-# ===== Claude 對話記錄 =====
-# 忽略 .claude 目錄下的所有檔案
-.claude/*
-# 但允許安全憲章和說明文件
-!.claude/SECURITY_CONSTITUTION.md
-!.claude/README.md
+# ===== Claude 對話記錄和安全憲章 =====
+# 所有 .claude 檔案都不提交（包含安全憲章）
+.claude/
 
 # ===== 個人筆記 =====
 NOTES.md
