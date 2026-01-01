@@ -76,6 +76,15 @@ async def analytics_dashboard(request: Request):
     )
 
 
+@app.get("/favicon.ico")
+async def favicon():
+    """Favicon 圖示（避免 404 錯誤）"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(
+        url="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/google/350/cat-face_1f431.png"
+    )
+
+
 @app.get("/health")
 async def health_check():
     """健康檢查端點"""
