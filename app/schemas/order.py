@@ -13,6 +13,8 @@ class MenuItem(BaseModel):
     name: str = Field(..., min_length=1, max_length=100, description="餐點名稱")
     quantity: int = Field(..., gt=0, le=99, description="數量（1-99）")
     price: int = Field(..., gt=0, description="單價")
+    temperature: Optional[str] = Field(None, description="溫度（飲料適用）")
+    sweetness: Optional[str] = Field(None, description="甜度（飲料適用）")
 
     @field_validator('id')
     @classmethod
@@ -23,12 +25,6 @@ class MenuItem(BaseModel):
         if v not in valid_ids:
             raise ValueError('無效的餐點 ID')
         return v
-
-
-class DrinkItem(MenuItem):
-    """飲料項目（含溫度和甜度）"""
-    temperature: Optional[str] = Field(None, description="溫度")
-    sweetness: Optional[str] = Field(None, description="甜度")
 
     @field_validator('temperature')
     @classmethod
@@ -49,6 +45,11 @@ class DrinkItem(MenuItem):
             if v not in valid_sweetness:
                 raise ValueError('無效的甜度選項')
         return v
+
+
+class DrinkItem(MenuItem):
+    """飲料項目（含溫度和甜度）- 已整合到 MenuItem"""
+    pass
 
 
 class OrderCreate(BaseModel):

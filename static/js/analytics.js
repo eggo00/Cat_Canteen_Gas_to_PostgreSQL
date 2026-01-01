@@ -35,14 +35,24 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCharts();
 });
 
-// 設定預設日期（最近 30 天）
+// 設定預設日期（當天）
 function setDefaultDates() {
+  const today = new Date();
+
+  document.getElementById('startDate').value = formatDate(today);
+  document.getElementById('endDate').value = formatDate(today);
+}
+
+// 設定最近 30 天
+function setLast30Days() {
   const endDate = new Date();
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - 30);
 
   document.getElementById('startDate').value = formatDate(startDate);
   document.getElementById('endDate').value = formatDate(endDate);
+
+  updateCharts();
 }
 
 // 格式化日期為 YYYY-MM-DD
@@ -113,9 +123,9 @@ async function updateSummaryCards() {
 
 // 更新營收趨勢圖表
 async function updateRevenueChart() {
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
   const dateParams = getDateParams();
-  const response = await fetch(`/api/analytics/revenue/daily?${dateParams}`);
-  const data = await response.json();
 
   const ctx = document.getElementById('revenueChart');
 
@@ -124,9 +134,33 @@ async function updateRevenueChart() {
     charts.revenue.destroy();
   }
 
-  charts.revenue = new Chart(ctx, {
-    type: 'line',
-    data: {
+  // 檢查是否為單日查詢
+  const isSingleDay = startDate === endDate;
+
+  let chartData, chartLabel;
+
+  if (isSingleDay) {
+    // 單日：顯示每小時營收
+    const response = await fetch(`/api/analytics/customer-behavior/peak-hours?${dateParams}`);
+    const data = await response.json();
+
+    chartData = {
+      labels: data.hourly_data.map(h => `${h.hour}:00`),
+      datasets: [{
+        label: '每小時營收 (NT$)',
+        data: data.hourly_data.map(h => h.revenue),
+        borderColor: COLORS.primary,
+        backgroundColor: COLORS.primary + '20',
+        fill: true,
+        tension: 0.4
+      }]
+    };
+  } else {
+    // 多日：顯示每日營收
+    const response = await fetch(`/api/analytics/revenue/daily?${dateParams}`);
+    const data = await response.json();
+
+    chartData = {
       labels: data.data.map(d => d.date),
       datasets: [{
         label: '每日營收 (NT$)',
@@ -136,7 +170,12 @@ async function updateRevenueChart() {
         fill: true,
         tension: 0.4
       }]
-    },
+    };
+  }
+
+  charts.revenue = new Chart(ctx, {
+    type: 'line',
+    data: chartData,
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -290,6 +329,7 @@ async function updatePickupMethodChart() {
         backgroundColor: [COLORS.primary, COLORS.secondary]
       }]
     },
+    plugins: [ChartDataLabels],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -307,6 +347,17 @@ async function updatePickupMethodChart() {
                 `營收: NT$ ${stat.revenue.toLocaleString()}`
               ];
             }
+          }
+        },
+        datalabels: {
+          color: '#fff',
+          font: {
+            size: 16,
+            weight: 'bold'
+          },
+          formatter: function(value, context) {
+            const stat = data.stats[context.dataIndex];
+            return `${stat.count}\n${stat.percentage.toFixed(1)}%`;
           }
         }
       }
@@ -394,6 +445,7 @@ async function updateIceLevelChart() {
         backgroundColor: CHART_COLORS
       }]
     },
+    plugins: [ChartDataLabels],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -410,6 +462,17 @@ async function updateIceLevelChart() {
                 `比例: ${pref.percentage}%`
               ];
             }
+          }
+        },
+        datalabels: {
+          color: '#fff',
+          font: {
+            size: 14,
+            weight: 'bold'
+          },
+          formatter: function(value, context) {
+            const pref = data.preferences[context.dataIndex];
+            return `${pref.count}\n${pref.percentage.toFixed(1)}%`;
           }
         }
       }
@@ -444,6 +507,7 @@ async function updateSweetnessChart() {
         backgroundColor: CHART_COLORS
       }]
     },
+    plugins: [ChartDataLabels],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -461,8 +525,150 @@ async function updateSweetnessChart() {
               ];
             }
           }
+        },
+        datalabels: {
+          color: '#fff',
+          font: {
+            size: 14,
+            weight: 'bold'
+          },
+          formatter: function(value, context) {
+            const pref = data.preferences[context.dataIndex];
+            return `${pref.count}\n${pref.percentage.toFixed(1)}%`;
+          }
         }
       }
     }
   });
+}
+
+// ========== Orders Modal Functions ==========
+
+// 顯示訂單明細 Modal
+async function showOrdersModal() {
+  const modal = document.getElementById('ordersModal');
+  modal.style.display = 'block';
+
+  // 載入訂單資料
+  await loadOrders();
+}
+
+// 關閉訂單明細 Modal
+function closeOrdersModal() {
+  const modal = document.getElementById('ordersModal');
+  modal.style.display = 'none';
+}
+
+// 載入訂單列表
+async function loadOrders() {
+  const container = document.getElementById('ordersTableContainer');
+
+  try {
+    const dateParams = getDateParams();
+    const response = await fetch(`/api/orders/?limit=1000`);
+    const orders = await response.json();
+
+    if (orders.length === 0) {
+      container.innerHTML = '<p style="text-align: center; padding: 50px; color: #999;">暫無訂單資料</p>';
+      return;
+    }
+
+    // 根據日期範圍篩選訂單
+    const startDate = new Date(document.getElementById('startDate').value);
+    const endDate = new Date(document.getElementById('endDate').value);
+    endDate.setHours(23, 59, 59, 999); // 包含整天
+
+    const filteredOrders = orders.filter(order => {
+      const orderDate = new Date(order.created_at);
+      return orderDate >= startDate && orderDate <= endDate;
+    });
+
+    if (filteredOrders.length === 0) {
+      container.innerHTML = '<p style="text-align: center; padding: 50px; color: #999;">所選日期範圍內無訂單</p>';
+      return;
+    }
+
+    // 按建立時間倒序排列
+    filteredOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    // 建立表格
+    let tableHTML = `
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>訂單編號</th>
+            <th>顧客姓名</th>
+            <th>取餐方式</th>
+            <th>訂單內容</th>
+            <th>總金額</th>
+            <th>訂購時間</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    filteredOrders.forEach(order => {
+      // 格式化訂單內容
+      let itemsText = '';
+      if (order.items && order.items.length > 0) {
+        itemsText += order.items.map(item =>
+          `${item.name} x${item.quantity}`
+        ).join(', ');
+      }
+      if (order.drinks && order.drinks.length > 0) {
+        if (itemsText) itemsText += '<br>';
+        itemsText += order.drinks.map(drink => {
+          let drinkText = `${drink.name} x${drink.quantity}`;
+          // 只有當溫度和甜度都存在時才顯示
+          if (drink.temperature && drink.sweetness) {
+            drinkText += ` (${drink.temperature}/${drink.sweetness})`;
+          }
+          return drinkText;
+        }).join(', ');
+      }
+
+      // 格式化時間
+      const orderDate = new Date(order.created_at);
+      const formattedDate = orderDate.toLocaleString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      tableHTML += `
+        <tr>
+          <td><strong>${order.order_number}</strong></td>
+          <td>${order.customer_name}</td>
+          <td>${order.pickup_method}</td>
+          <td><div class="order-items">${itemsText}</div></td>
+          <td><strong>NT$ ${order.total_amount.toLocaleString()}</strong></td>
+          <td>${formattedDate}</td>
+        </tr>
+      `;
+    });
+
+    tableHTML += `
+        </tbody>
+      </table>
+      <p style="margin-top: 20px; text-align: center; color: #666;">
+        共 ${filteredOrders.length} 筆訂單
+      </p>
+    `;
+
+    container.innerHTML = tableHTML;
+
+  } catch (error) {
+    console.error('載入訂單時發生錯誤:', error);
+    container.innerHTML = '<p style="text-align: center; padding: 50px; color: #f56565;">載入訂單時發生錯誤</p>';
+  }
+}
+
+// 點擊 Modal 外部關閉
+window.onclick = function(event) {
+  const modal = document.getElementById('ordersModal');
+  if (event.target === modal) {
+    closeOrdersModal();
+  }
 }

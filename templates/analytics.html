@@ -6,6 +6,7 @@
   <title>📊 分析報表 - Cat Claws 貓咪食堂</title>
   <link rel="icon" href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/google/350/cat-face_1f431.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -180,6 +181,114 @@
       height: 300px;
     }
 
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      overflow: auto;
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 50px auto;
+      padding: 0;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 1200px;
+      max-height: 80vh;
+      overflow: hidden;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.8em;
+    }
+
+    .close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 30px;
+      max-height: calc(80vh - 100px);
+      overflow-y: auto;
+    }
+
+    /* Orders Table */
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .orders-table th {
+      background: #667eea;
+      color: white;
+      padding: 15px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .orders-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .orders-table tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    .order-items {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .order-status {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+
+    .status-completed {
+      background: #48bb78;
+      color: white;
+    }
+
     /* Loading */
     .loading {
       text-align: center;
@@ -231,6 +340,14 @@
       </div>
     </div>
 
+    <!-- Revenue Trend Chart (Highlighted) -->
+    <div class="chart-card full-width" style="margin-bottom: 30px;">
+      <h2>📈 每日營收趨勢</h2>
+      <div class="chart-container">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+
     <!-- Date Filter -->
     <div class="date-filter">
       <label>📅 日期範圍：</label>
@@ -238,7 +355,7 @@
       <label>到</label>
       <input type="date" id="endDate">
       <button onclick="updateCharts()">🔍 更新報表</button>
-      <button onclick="setDefaultDates()">📆 最近 30 天</button>
+      <button onclick="setLast30Days()">📆 最近 30 天</button>
     </div>
 
     <!-- Loading Indicator -->
@@ -257,7 +374,7 @@
       <div class="summary-card">
         <div class="icon">📦</div>
         <div class="label">總訂單數</div>
-        <div class="value" id="totalOrders">0</div>
+        <div class="value" id="totalOrders" style="cursor: pointer; text-decoration: underline;" onclick="showOrdersModal()" title="點擊查看訂單明細">0</div>
       </div>
       <div class="summary-card">
         <div class="icon">💵</div>
@@ -273,14 +390,6 @@
 
     <!-- Charts -->
     <div class="chart-grid">
-      <!-- Revenue Trend -->
-      <div class="chart-card full-width">
-        <h2>📈 每日營收趨勢</h2>
-        <div class="chart-container">
-          <canvas id="revenueChart"></canvas>
-        </div>
-      </div>
-
       <!-- Popular Dishes -->
       <div class="chart-card">
         <h2>🍛 熱門餐點 Top 10</h2>
@@ -326,6 +435,21 @@
         <h2>🍯 飲料甜度偏好</h2>
         <div class="chart-container small">
           <canvas id="sweetnessChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Modal -->
+  <div id="ordersModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📋 訂單明細</h2>
+        <button class="close-btn" onclick="closeOrdersModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="ordersTableContainer">
+          <p style="text-align: center; padding: 20px;">載入中...</p>
         </div>
       </div>
     </div>

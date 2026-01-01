@@ -146,10 +146,31 @@ function addToCart(itemId, isDrink) {
     const sweetSelect = document.getElementById('sweet-' + itemId);
     cartItem.temperature = tempSelect.value;
     cartItem.sweetness = sweetSelect.value;
+    console.log('飲料選項 - ID:', itemId, '溫度:', cartItem.temperature, '甜度:', cartItem.sweetness);
   }
 
-  // 加入購物車
-  cart.push(cartItem);
+  // 檢查購物車中是否已有相同項目
+  let existingItem = cart.find(function(existing) {
+    // 比較 ID
+    if (existing.id !== itemId) return false;
+
+    // 如果是飲料，還需要比較溫度和甜度
+    if (isDrink) {
+      return existing.temperature === cartItem.temperature &&
+             existing.sweetness === cartItem.sweetness;
+    }
+
+    // 如果不是飲料，只要 ID 相同就算相同項目
+    return true;
+  });
+
+  if (existingItem) {
+    // 已存在，增加數量
+    existingItem.quantity += quantity;
+  } else {
+    // 不存在，加入購物車
+    cart.push(cartItem);
+  }
 
   // 重設數量為 1
   document.getElementById('qty-' + itemId).textContent = '1';
